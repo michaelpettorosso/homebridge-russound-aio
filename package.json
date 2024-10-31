@@ -21,6 +21,8 @@
   ],
     "files": [
     "src",
+    "graphics",
+    "doc",
     "index.js",
     "config.schema.json",
     "package.json",

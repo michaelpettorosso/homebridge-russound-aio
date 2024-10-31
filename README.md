@@ -58,116 +58,79 @@ Add the platform in `config.json` in your home directory inside `.homebridge` an
 {
    "platforms":[
       {
-         "name":"Russound",
-         "controllers":[
-            {
-               "name":"MCA XXX",
-               "ip":"your.russound.ip",
-               "zones":[
-                  {
-                     "name":"Zone1",
-                     "display_name":"Zone 1",
-                     "sources":[
+         "name":"Russound AIO",
+         "host":"your.russound.ip",
+         "port": 9621,
+         "enableDebugMode": true,
+         "platform": "Russound-AIO",
+         "zones": {
+             "1": {
+	         "enabled": true,
+                 "sources": [
                         "Source1",
                         "Source2",
                         "Source3",
                         "Source4",
                         "Source5",
                         "Source6"
-                     ]
-                  },
-                  {
-                     "name":"Zone2",
-                     "display_name":"Zone 2",
-                     "sources":[
+                    ]
+                },
+                "2": {
+	         "enabled": true,
+                 "sources": [
                         "Source1",
                         "Source2",
                         "Source3",
                         "Source4",
                         "Source5",
                         "Source6"
-                     ]
-                  },
-                  {
-                     "name":"Zone3",
-                     "display_name":"Zone 3",
-                     "sources":[
+                    ]
+                },
+                "3": {
+	         "enabled": true,
+                 "sources": [
                         "Source1",
                         "Source2",
                         "Source3",
                         "Source4",
                         "Source5",
                         "Source6"
-                     ],
-                     "enable":false
-                  },
-                  {
-                     "name":"Zone4",
-                     "display_name":"Zone 4",
-                     "sources":[
+                    ]
+                },
+                "4": {
+	         "enabled": true,
+                 "sources": [
                         "Source1",
                         "Source2",
                         "Source3",
                         "Source4",
                         "Source5",
                         "Source6"
-                     ]
-                  },
-                  {
-                     "name":"Zone5",
-                     "display_name":"Zone 5",
-                     "sources":[
+                    ]
+                },
+                "5": {
+	         "enabled": true,
+                 "sources": [
                         "Source1",
                         "Source2",
                         "Source3",
                         "Source4",
                         "Source5",
                         "Source6"
-                     ]
-                  },
-                  {
-                     "name":"Zone6",
-                     "display_name":"Zone 6",
-                     "sources":[
+                    ]
+                },
+                "6": {
+	         "enabled": true,
+                 "sources": [
                         "Source1",
                         "Source2",
                         "Source3",
                         "Source4",
                         "Source5",
                         "Source6"
-                     ]
-                  }
-               ],
-               "sources":[
-                  {
-                     "name":"Source1",
-                     "display_name":"Source 1"
-                  },
-                  {
-                     "name":"Source2",
-                     "display_name":"Source 2"
-                  },
-                  {
-                     "name":"Source3",
-                     "display_name":"Source 3"
-                  },
-                  {
-                     "name":"Source4",
-                     "display_name":"Source 4"
-                  },
-                  {
-                     "name":"Source5",
-                     "display_name":"Source 5"
-                  },
-                  {
-                     "name":"Source6",
-                     "display_name":"Source 6"
-                  }
-               ]
+                    ]
+                }
             }
-         ],
-         "debug":false,
-         "platform":"Russound-AIO"
       }
    ]
 }
@@ -203,30 +166,44 @@ Platform-level configuration parameters:
 
 | Fields                 | Description                                                        | Default                                                                   | Required |
 |------------------------|--------------------------------------------------------------------|---------------------------------------------------------------------------|----------|
-| platform               | Must always be `Russound`.                                         |                                                                           | Yes      |
-| name                   | Name to use for the Russound platform.                             |                                                                           | No       |
-| debug                  | Enable debug logging.                                              | false                                                                     | No       |
+| platform               | Must always be `Russound-AIO`                                      |                                                                           | Yes      |
+| host                   | Host IP address of your Russound Controller                        |                                                                           | Yes      |
+| port                   | API Port of your Russound Controller                               | 9621                                                                      | No       |
 
-`controllers` configuration parameters:
+| name                   | Name to use for this Russound Controller.                          | [controller type] eg. MCA-66                                              | No       |
+| zoneNameSuffix         | Suffix to add to Zone Name eg. Speaker                             |                                                                           | No       |
+| addRemote              | Add Apple remote to all Zones                                      | false                                                                     | No       |
+| inputsDisplayOrder     | Display order for inputs in Homekit                                | 0 [0 - Russound, 1 - Name Asc, 2 - Name Desc]                             | No       |
+| volumeControl          | Add volume accessory                                               | 1 [0 - None, 1 - As Light (Brightness), 2 - As Fan]                       | No       |
+| sensorPower            | Add Sensor Power (for change)                                      | false                                                                     | No       |
+| sensorVolume           | Add Sensor Volume (for change)                                     | false                                                                     | No       |
+| sensorMute             | Add Sensor Mute (for change)                                       | false                                                                     | No       |
+| sensorInput            | Add Sensor Input (for change)                                      | false                                                                     | No       |
 
+
+| zones                  | List of Zones to configure                                         | {}                                                                        | No       |
+
+
+`logging` parameters:
 | Fields                 | Description                                                        | Default                                                                   | Required |
 |------------------------|--------------------------------------------------------------------|---------------------------------------------------------------------------|----------|
-| name                   | Name to use for this Russound Controller.                          | MCA-88X                                                                   | No       |
-| ip                     | IP address of your Russound Controller.                            |                                                                           | Yes      |
+| enableDebugMode        | Enable debug logging in Homebridge                                 | false                                                                     | No       |
+| disableLogInfo         | Disable state log info in Homebridge                               | false                                                                     | No       |
+| disableLogDeviceInfo   | Disable device log info in Homebridge                              | false                                                                     | No       |
 
-`zones` zones parameters:
+
+`zones` Zones settings:
 | Fields                 | Description                                                        | Default                                                                   | Required |
 |------------------------|--------------------------------------------------------------------|---------------------------------------------------------------------------|----------|
-| name                   | Name to of this zone configured on the Russound Controller.        |                                                                           | Yes      |
-| display_name           | Name that you want the zone to display.                            | if blank it is name                                                       | No       |
-| sources                | List of sources to add to zone.                                    |                                                                           | No       |
-| enable                 | Hides zone from Homekit                                            | true                                                                      | No       |
+| zoneId                 | Id of this zone configured on the Russound Controller.             |                                                                           | Yes      |
+| enabled                | Hides zone from Homekit                                            | true                                                                      | No       |
+| addRemote              | Add Apple remote for Zone                                          | false                                                                     | No       |
+| sources                | List of sources to add to Zone                                     |                                                                           | No       |
 
-`sources` sources parameters:
+`sources` sources settings:
 | Fields                 | Description                                                        | Default                                                                   | Required |
 |------------------------|--------------------------------------------------------------------|---------------------------------------------------------------------------|----------|
-| name                   | Name to of this source configured on the Russound Controller.      |                                                                           | Yes      |
-| display_name           | Name that you want the source name to display                      | if blank it is name                                                       | No       |
+| name                   | Name to of this source configured on the Russound Controller       |                                                                           | Yes      |
 
 
 ## Credits
