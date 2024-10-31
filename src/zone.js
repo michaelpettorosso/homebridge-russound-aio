@@ -128,68 +128,56 @@ class Zone extends EventEmitter {
             const input = this.inputsConfigured.find(input => input.identifier == parseInt(currentSource,10)) ?? false;
             const inputIdentifier = input ? input.identifier : this.inputIdentifier;
             if (this.televisionService) {
-                const pictureModeHomeKit = Characteristic.PictureMode.OTHER;
-                this.televisionService
-                    .updateCharacteristic(Characteristic.Active, powerState)
-                    .updateCharacteristic(Characteristic.ActiveIdentifier, inputIdentifier)
-                    .updateCharacteristic(Characteristic.PictureMode, pictureModeHomeKit);
+                this.televisionService.getCharacteristic(Characteristic.Active).updateValue(powerState);
+                this.televisionService.getCharacteristic(Characteristic.ActiveIdentifier).updateValue(inputIdentifier);
 
-                //this.televisionService.getCharacteristic(Characteristic.Active).updateValue(powerState)    
                 this.debugLog(`mutedState: ${mutedState}, powerState: ${powerState}`);
 
             }
  
             if (this.speakerService) {
                 const volumeValue = this.getScaledVolume(volume);
-                this.speakerService
-                    .updateCharacteristic(Characteristic.Active, powerState)
-                    .updateCharacteristic(Characteristic.Volume, volumeValue)
-                    .updateCharacteristic(Characteristic.Mute, mutedState);
+                this.speakerService.getCharacteristic(Characteristic.Active).updateValue(powerState);
+                this.speakerService.getCharacteristic(Characteristic.Volume).updateValue(volumeValue);
+                this.speakerService.getCharacteristic(Characteristic.Mute).updateValue(mutedState);
 
                 if (this.volumeService) {
-                    this.volumeService
-                        .updateCharacteristic(Characteristic.Brightness, volumeValue)
-                        .updateCharacteristic(Characteristic.On, !mutedState);
+                    this.volumeService.getCharacteristic(Characteristic.Brightness).updateValue(volumeValue);
+                    this.volumeService.getCharacteristic(Characteristic.On).updateValue(!mutedState);
                 }
 
                 if (this.volumeServiceFan) {
-                    this.volumeServiceFan
-                        .updateCharacteristic(Characteristic.RotationSpeed, volumeValue)
-                        .updateCharacteristic(Characteristic.On, !mutedState);
+                    this.volumeServiceFan.getCharacteristic(Characteristic.RotationSpeed).updateValue(volumeValue);
+                    this.volumeServiceFan.getCharacteristic(Characteristic.On).updateValue(!mutedState);
                 }
             }
 
             //sensors
             if (this.sensorPowerService) {
-                const state = power ? Characteristic.ContactSensorState.CONTACT_DETECTED : Characteristic.ContactSensorState.CONTACT_NOT_DETECTED;
-
-                this.sensorPowerService
-                    .updateCharacteristic(Characteristic.ContactSensorState, state)
+                const state = power ;
+                this.sensorPowerService.getCharacteristic(Characteristic.ContactSensorState).updateValue(this.contactSensorState(state))
             }
 
             if (volume !== this.volume) {
                 for (let i = 0; i < 2; i++) {
-                    const state = power ? [true, false][i] : false;
+                    const state = (power ? [true, false][i] : false);
                     if (this.sensorVolumeService) {
-                        this.sensorVolumeService
-                            .updateCharacteristic(Characteristic.ContactSensorState, state ? Characteristic.ContactSensorState.CONTACT_DETECTED : Characteristic.ContactSensorState.CONTACT_NOT_DETECTED)
+                        this.sensorVolumeService.getCharacteristic(Characteristic.ContactSensorState).updateValue(this.contactSensorState(state))
                         this.sensorVolumeState = state;
                     }
                 }
             }
 
             if (this.sensorMuteService) {
-                const state = power && mute === 'ON' ? Characteristic.ContactSensorState.CONTACT_DETECTED : Characteristic.ContactSensorState.CONTACT_NOT_DETECTED;
-                this.sensorMuteService
-                    .updateCharacteristic(Characteristic.ContactSensorState, state)
+                const state = power && mute === 'ON';
+                this.sensorMuteService.getCharacteristic(Characteristic.ContactSensorState).updateValue(this.contactSensorState(state));
             }
 
             if (inputIdentifier !== this.inputIdentifier) {
                 for (let i = 0; i < 2; i++) {
                     const state = power ? [true, false][i] : false;
                     if (this.sensorInputService) {
-                        this.sensorInputService
-                            .updateCharacteristic(Characteristic.ContactSensorState, state ? Characteristic.ContactSensorState.CONTACT_DETECTED : Characteristic.ContactSensorState.CONTACT_NOT_DETECTED)
+                        this.sensorInputService.getCharacteristic(Characteristic.ContactSensorState).updateValue(this.contactSensorState(state)); 
                         this.sensorInputState = state;
                     }
                 }
@@ -222,6 +210,10 @@ class Zone extends EventEmitter {
         } catch (error) {
             throw new Error(`onStateChange error: ${error.message || error}.`);
         };
+    }
+
+    contactSensorState = (state) => {
+        return state ? Characteristic.ContactSensorState.CONTACT_DETECTED : Characteristic.ContactSensorState.CONTACT_NOT_DETECTED;
     }
 
     start = async(sources) => {
@@ -407,10 +399,6 @@ class Zone extends EventEmitter {
             this.televisionService.setCharacteristic(Characteristic.SleepDiscoveryMode, Characteristic.SleepDiscoveryMode.ALWAYS_DISCOVERABLE);
 
             this.televisionService.getCharacteristic(Characteristic.Active)
-                // .onGet(() => {
-                //     const state = this.power ? Characteristic.Active.ACTIVE : Characteristic.Active.INACTIVE;
-                //     return state;
-                // })
                 .onSet(async (state) => {
                     if (this.power == state) {
                         return;
@@ -429,11 +417,6 @@ class Zone extends EventEmitter {
                 });
 
             this.televisionService.getCharacteristic(Characteristic.ActiveIdentifier)
-                // .onGet(async () => {
-                //     const inputIdentifier = this.inputIdentifier;
-                //     return inputIdentifier;
-                // })
-
                 .onSet(async (activeIdentifier) => {
                     try {
                         const input = this.inputsConfigured.find(input => input.identifier === activeIdentifier);
@@ -441,7 +424,7 @@ class Zone extends EventEmitter {
 
                         switch (this.power) {
                             case false:
-                                await new Promise(resolve => setTimeout(resolve, 4000));
+                                await new Promise(resolve => setTimeout(resolve, 1000));
                                 const tryAgain = this.power ? this.televisionService.setCharacteristic(Characteristic.ActiveIdentifier, activeIdentifier) : false;
                                 break;
                             case true:
@@ -593,7 +576,7 @@ class Zone extends EventEmitter {
                         else
                           await this.zone.zoneUnmute();
                         this.muted = state;
-                        const info = this.logInfo(`set Mute: ${state ? 'ON' : 'OFF'}`);
+                        const info = this.infoLog(`set Mute: ${state ? 'ON' : 'OFF'}`);
                     } catch (error) {
                         this.warnLog(`set Mute error: ${error}`);
                     };

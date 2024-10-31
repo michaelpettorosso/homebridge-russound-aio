@@ -164,46 +164,48 @@ Feature options allow you to enable or disable certain features in this plugin. 
 
 Platform-level configuration parameters:
 
-| Fields                 | Description                                                        | Default                                                                   | Required |
-|------------------------|--------------------------------------------------------------------|---------------------------------------------------------------------------|----------|
-| platform               | Must always be `Russound-AIO`                                      |                                                                           | Yes      |
-| host                   | Host IP address of your Russound Controller                        |                                                                           | Yes      |
-| port                   | API Port of your Russound Controller                               | 9621                                                                      | No       |
+| Fields                  | Description                                                        | Default                                                                   | Required |
+|-------------------------|--------------------------------------------------------------------|---------------------------------------------------------------------------|----------|
+| platform                | Must always be `Russound-AIO`                                      |                                                                           | Yes      |
+| host                    | Host IP address of your Russound Controller                        |                                                                           | Yes      |
+| port                    | API Port of your Russound Controller                               | 9621                                                                      | No       |
 
-| name                   | Name to use for this Russound Controller.                          | [controller type] eg. MCA-66                                              | No       |
-| zoneNameSuffix         | Suffix to add to Zone Name eg. Speaker                             |                                                                           | No       |
-| addRemote              | Add Apple remote to all Zones                                      | false                                                                     | No       |
-| inputsDisplayOrder     | Display order for inputs in Homekit                                | 0 [0 - Russound, 1 - Name Asc, 2 - Name Desc]                             | No       |
-| volumeControl          | Add volume accessory                                               | 1 [0 - None, 1 - As Light (Brightness), 2 - As Fan]                       | No       |
-| sensorPower            | Add Sensor Power (for change)                                      | false                                                                     | No       |
-| sensorVolume           | Add Sensor Volume (for change)                                     | false                                                                     | No       |
-| sensorMute             | Add Sensor Mute (for change)                                       | false                                                                     | No       |
-| sensorInput            | Add Sensor Input (for change)                                      | false                                                                     | No       |
+| name                    | Name to use for this Russound Controller.                          | [controller type] eg. MCA-66                                              | No       |
+| zoneNameSuffix          | Suffix to add to Zone Name eg. Speaker                             |                                                                           | No       |
+| addRemote               | Add Apple remote to all Zones                                      | false                                                                     | No       |
+| inputsDisplayOrder      | Display order for inputs in Homekit                                | 0 [0 - Russound, 1 - Name Asc, 2 - Name Desc]                             | No       |
+| volumeControl           | Add volume accessory                                               | 1 [0 - None, 1 - As Light (Brightness), 2 - As Fan]                       | No       |
+| volumeControlName       | Added volume name                                                  | Volume                                                                    | No       |
+| volumeControlNamePrefix | Add Zone name as prefix to volume name                             | false                                                                     | No       |
+| volumeMax               | Max volume of Zones                                                | 50 [MCA Device tested]                                                    | No       |
+| sensorPower             | Add Sensor Power (for change)                                      | false                                                                     | No       |
+| sensorVolume            | Add Sensor Volume (for change)                                     | false                                                                     | No       |
+| sensorMute              | Add Sensor Mute (for change)                                       | false                                                                     | No       |
+| sensorInput             | Add Sensor Input (for change)                                      | false                                                                     | No       |
 
-
-| zones                  | List of Zones to configure                                         | {}                                                                        | No       |
+| zones                   | List of Zones to configure                                         | {}                                                                        | No       |
 
 
 `logging` parameters:
-| Fields                 | Description                                                        | Default                                                                   | Required |
-|------------------------|--------------------------------------------------------------------|---------------------------------------------------------------------------|----------|
-| enableDebugMode        | Enable debug logging in Homebridge                                 | false                                                                     | No       |
-| disableLogInfo         | Disable state log info in Homebridge                               | false                                                                     | No       |
-| disableLogDeviceInfo   | Disable device log info in Homebridge                              | false                                                                     | No       |
+| Fields                  | Description                                                        | Default                                                                   | Required |
+|-------------------------|--------------------------------------------------------------------|---------------------------------------------------------------------------|----------|
+| enableDebugMode         | Enable debug logging in Homebridge                                 | false                                                                     | No       |
+| disableLogInfo          | Disable state log info in Homebridge                               | false                                                                     | No       |
+| disableLogDeviceInfo    | Disable device log info in Homebridge                              | false                                                                     | No       |
 
 
 `zones` Zones settings:
-| Fields                 | Description                                                        | Default                                                                   | Required |
-|------------------------|--------------------------------------------------------------------|---------------------------------------------------------------------------|----------|
-| zoneId                 | Id of this zone configured on the Russound Controller.             |                                                                           | Yes      |
-| enabled                | Hides zone from Homekit                                            | true                                                                      | No       |
-| addRemote              | Add Apple remote for Zone                                          | false                                                                     | No       |
-| sources                | List of sources to add to Zone                                     |                                                                           | No       |
+| Fields                  | Description                                                        | Default                                                                   | Required |
+|-------------------------|--------------------------------------------------------------------|---------------------------------------------------------------------------|----------|
+| zoneId                  | Id of this zone configured on the Russound Controller.             |                                                                           | Yes      |
+| enabled                 | Hides zone from Homekit                                            | true                                                                      | No       |
+| addRemote               | Add Apple remote for Zone                                          | false                                                                     | No       |
+| sources                 | List of sources to add to Zone                                     |                                                                           | No       |
 
 `sources` sources settings:
-| Fields                 | Description                                                        | Default                                                                   | Required |
-|------------------------|--------------------------------------------------------------------|---------------------------------------------------------------------------|----------|
-| name                   | Name to of this source configured on the Russound Controller       |                                                                           | Yes      |
+| Fields                  | Description                                                        | Default                                                                   | Required |
+|-------------------------|--------------------------------------------------------------------|---------------------------------------------------------------------------|----------|
+| name                    | Name to of this source configured on the Russound Controller       |                                                                           | Yes      |
 
 
 ## Credits
