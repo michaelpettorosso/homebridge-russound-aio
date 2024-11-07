@@ -36,6 +36,8 @@ class Zone extends EventEmitter {
         this.modelName = `${this.controller.controllerType}-Zone-${this.zoneId}`;
         this.serialNumber = `${this.zone.deviceStr.replace(/[\[\].']+/g,'')}`;
         this.firmwareRevision = this.controller.firmwareVersion;
+        this.macAddress = this.controller.macAddress;
+        this.apiVersion = this.controller.client.rioVersion;
         
         //configured name
         const nameSuffix = config?.zoneNameSuffix || '';
@@ -258,7 +260,7 @@ class Zone extends EventEmitter {
                 this.devInfoLog(`Control: ${this.zone.name}`);
                 this.devInfoLog(`Zone Id: ${this.zoneId}`);
                 this.devInfoLog(`Firmware: ${this.firmwareRevision}`);
-                this.devInfoLog(`Api Version: ${this.controller.client.rioVersion}`);
+                this.devInfoLog(`Api Version: ${this.apiVersion}`);
                 this.devInfoLog(`Serial Number: ${this.serialNumber}`);
                 this.devInfoLog(`----------------------------------`);
             }
@@ -270,7 +272,7 @@ class Zone extends EventEmitter {
                 control: `Zone ${this.zone.name}`,
                 zoneId: this.zoneId,
                 firmware: this.firmwareRevision,
-                apiVersion: this.controller.client.rioVersion,
+                apiVersion: this.apiVersion,
                 serialNumber: this.serialNumber
              });
 
@@ -362,9 +364,12 @@ class Zone extends EventEmitter {
           .setCharacteristic(Characteristic.Model, this.modelName)
           .setCharacteristic(Characteristic.SerialNumber, this.serialNumber)
           .setCharacteristic(Characteristic.FirmwareRevision, this.firmwareRevision);
-        this.setOptionalCharacteristic(this.informationService, Characteristic.ConfiguredName, this.name);
-        this.setOptionalCharacteristic(this.informationService, Characteristic.HardwareRevision, this.controller.macAddress)
-        this.setOptionalCharacteristic(this.informationService, Characteristic.SoftwareRevision, this.controller.client.rioVersion)
+        this.informationService.addOptionalCharacteristic(Characteristic.ConfiguredName);
+        this.informationService.setCharacteristic(Characteristic.ConfiguredName, this.name);  
+        this.informationService.addOptionalCharacteristic(Characteristic.HardwareRevision);
+        this.informationService.setCharacteristic(Characteristic.HardwareRevision, this.macAddress);  
+        this.informationService.addOptionalCharacteristic(Characteristic.SoftwareRevision);
+        this.informationService.setCharacteristic(Characteristic.SoftwareRevision, this.apiVersion);  
         this.addService(this.informationService);
       }
     
@@ -484,9 +489,8 @@ class Zone extends EventEmitter {
                 });    
         this.addService(this.televisionService);
         this.prepareTvSpeakerService();
-        this.prepareInputSourcesService(allSources)
+        this.prepareInputSourcesService(allSources);
     }
-
 
     prepareTvSpeakerService = () => {
         //prepare speaker service
@@ -539,7 +543,6 @@ class Zone extends EventEmitter {
             });
 
         this.speakerService.getCharacteristic(Characteristic.Mute)
-
             .onSet(async (state) => {
                 try {
                     if (state)
@@ -585,12 +588,6 @@ class Zone extends EventEmitter {
             const savedInputsName = this.savedInputsNames[inputIdentifier] || false;
             input.name = savedInputsName ? savedInputsName : input.name;
 
-            //get type
-            const inputSourceType = Characteristic.InputSourceType.OTHER;
-
-            //get configured
-            const isConfigured = Characteristic.IsConfigured.CONFIGURED;
-
             //get visibility
             input.visibility = this.savedInputsTargetVisibility[inputIdentifier] || Characteristic.CurrentVisibilityState.SHOWN;
 
@@ -600,8 +597,8 @@ class Zone extends EventEmitter {
                 .setCharacteristic(Characteristic.Name, input.name)
                 .setCharacteristic(Characteristic.ConfiguredName, input.name)
                 .setCharacteristic(Characteristic.Identifier, inputIdentifier)
-                .setCharacteristic(Characteristic.IsConfigured, isConfigured)
-                .setCharacteristic(Characteristic.InputSourceType, inputSourceType)
+                .setCharacteristic(Characteristic.IsConfigured, Characteristic.IsConfigured.CONFIGURED)
+                .setCharacteristic(Characteristic.InputSourceType, Characteristic.InputSourceType.OTHER)
                 .setCharacteristic(Characteristic.CurrentVisibilityState, input.visibility)
 
             inputService.getCharacteristic(Characteristic.ConfiguredName)
@@ -613,11 +610,13 @@ class Zone extends EventEmitter {
                     try {
                         this.savedInputsNames[inputIdentifier] = value;
                         await Utils.saveData(this.inputsNamesFile, this.savedInputsNames);
+                        const input = this.inputsConfigured.find(input => input.identifier == inputIdentifier);
+                        if (input)
+                            input.name = value;
                         this.debugLog(`Saved Input Name: ${value}, Input Identifier: ${inputIdentifier}`);
 
                         //sort inputs
 
-                        input.name =  value
                         await this.displayOrder();
                     } catch (error) {
                         this.warnLog(`save Input Name error: ${error}`);
@@ -644,17 +643,17 @@ class Zone extends EventEmitter {
             this.televisionService.addLinkedService(inputService);
             this.addService(inputService);
         };
-        
     }
 
     prepareVolumeService = () => {
             //prepare volume service
         if (this.volumeControl) {
             this.debugLog(`Prepare volume service`);
-            const volumeServiceName = this.volumeControlNamePrefix ? `${this.name} ${this.volumeControlName}` : this.volumeControlName;
+            const serviceName = this.volumeControlNamePrefix ? `${this.name} ${this.volumeControlName}` : this.volumeControlName;
             if (this.volumeControl === 1) {
-                this.volumeService = new Service.Lightbulb(volumeServiceName, 'volumeService');
-                this.setOptionalCharacteristic(this.volumeService, Characteristic.ConfiguredName, volumeServiceName);
+                this.volumeService = new Service.Lightbulb(serviceName, 'volumeService');
+                this.volumeService.addOptionalCharacteristic(Characteristic.ConfiguredName);
+                this.volumeService.setCharacteristic(Characteristic.ConfiguredName, serviceName);  
                 this.volumeService.getCharacteristic(Characteristic.Brightness)
                     .setProps({
                         minValue: 0,
@@ -672,8 +671,10 @@ class Zone extends EventEmitter {
             }
 
             if (this.volumeControl === 2) {
-                this.volumeServiceFan = new Service.Fanv2(volumeServiceName, 'volumeService');
-                this.setOptionalCharacteristic(this.volumeServiceFan, Characteristic.ConfiguredName, volumeServiceName);
+                this.volumeServiceFan = new Service.Fanv2(serviceName, 'volumeService');
+                this.volumeServiceFan.addOptionalCharacteristic(Characteristic.ConfiguredName);
+                this.volumeServiceFan.setCharacteristic(Characteristic.ConfiguredName, serviceName);  
+
                 this.volumeServiceFan.getCharacteristic(Characteristic.RotationSpeed)
                     .setProps({
                         minValue: 0,
@@ -751,7 +752,8 @@ class Zone extends EventEmitter {
 
                 const serviceName = namePrefix ? `${this.Name} ${buttonName}` : buttonName;
                 const buttonService = new serviceType(serviceName, `Button ${i}`);
-                this.setOptionalCharacteristic(buttonService, Characteristic.ConfiguredName, serviceName)
+                buttonService.addOptionalCharacteristic(Characteristic.ConfiguredName);
+                buttonService.setCharacteristic(Characteristic.ConfiguredName, serviceName);  
                 buttonService.getCharacteristic(Characteristic.On)
                     .onSet(async (state) => {
                         try {
@@ -786,9 +788,10 @@ class Zone extends EventEmitter {
           this.debugLog(`Sensor Type: ${sensorType}, missing function for trigger!`);
           return;
         }
-
-        const sensorService = new Service.ContactSensor(`${this.name} ${sensorType} Sensor`, `${sensorType.toLowerCase()}Sensor`);
-        this.setOptionalCharacteristic(sensorService, Characteristic.ConfiguredName, `${this.name} ${sensorType} Sensor`);
+        const serviceName = `${this.name} ${sensorType} Sensor`;
+        const sensorService = new Service.ContactSensor(sensorName, `${sensorType.toLowerCase()}Sensor`);
+        sensorService.addOptionalCharacteristic(Characteristic.ConfiguredName);
+        sensorService.setCharacteristic(Characteristic.ConfiguredName, serviceName);  
         sensorService.getCharacteristic(Characteristic.ContactSensorState)
             .onGet(async () => {
                 const state = sensorStateFn() ? Characteristic.ContactSensorState.CONTACT_DETECTED : Characteristic.ContactSensorState.CONTACT_NOT_DETECTED;
@@ -803,10 +806,10 @@ class Zone extends EventEmitter {
           .getCharacteristic(Characteristic.On)
           .onGet(this.getStatelessSwitchState)
           .onSet((state) => {
-                setterFn(state);
+            setterFn(state);
           });
-    
-        this.setOptionalCharacteristic(newStatelessSwitchService, Characteristic.ConfiguredName, name);
+        newStatelessSwitchService.addOptionalCharacteristic(Characteristic.ConfiguredName);
+        newStatelessSwitchService.setCharacteristic(Characteristic.ConfiguredName, name);  
         return newStatelessSwitchService;
     }
     
@@ -817,13 +820,6 @@ class Zone extends EventEmitter {
 
     getStatelessSwitchState = () => {
         return false;
-    }
-
-    setOptionalCharacteristic = (service, characteristic, value) => {
-        if (service) {
-            service.addOptionalCharacteristic(characteristic);
-            service.setCharacteristic(Characteristic, value);
-        }
     }
 
     setMute = async (state) => {
