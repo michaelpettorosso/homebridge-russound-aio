@@ -63,9 +63,10 @@ Add the platform in `config.json` in your home directory inside `.homebridge` an
          "port": 9621,
          "enableDebugMode": true,
          "platform": "Russound-AIO",
-         "zones": {
-             "1": {
-	         "enabled": true,
+         "zones": [
+                { 
+                 "zoneId": "1",
+	             "enabled": true,
                  "sources": [
                         "Source1",
                         "Source2",
@@ -75,8 +76,9 @@ Add the platform in `config.json` in your home directory inside `.homebridge` an
                         "Source6"
                     ]
                 },
-                "2": {
-	         "enabled": true,
+                { 
+                 "zoneId": "2",
+	             "enabled": true,
                  "sources": [
                         "Source1",
                         "Source2",
@@ -86,8 +88,9 @@ Add the platform in `config.json` in your home directory inside `.homebridge` an
                         "Source6"
                     ]
                 },
-                "3": {
-	         "enabled": true,
+                { 
+                 "zoneId": "3",
+	             "enabled": true,
                  "sources": [
                         "Source1",
                         "Source2",
@@ -97,8 +100,9 @@ Add the platform in `config.json` in your home directory inside `.homebridge` an
                         "Source6"
                     ]
                 },
-                "4": {
-	         "enabled": true,
+                { 
+                 "zoneId": "4",
+	             "enabled": true,
                  "sources": [
                         "Source1",
                         "Source2",
@@ -108,8 +112,9 @@ Add the platform in `config.json` in your home directory inside `.homebridge` an
                         "Source6"
                     ]
                 },
-                "5": {
-	         "enabled": true,
+                { 
+                 "zoneId": "5",
+	             "enabled": true,
                  "sources": [
                         "Source1",
                         "Source2",
@@ -119,8 +124,9 @@ Add the platform in `config.json` in your home directory inside `.homebridge` an
                         "Source6"
                     ]
                 },
-                "6": {
-	         "enabled": true,
+                { 
+                 "zoneId": "6",
+	             "enabled": true,
                  "sources": [
                         "Source1",
                         "Source2",
@@ -130,7 +136,7 @@ Add the platform in `config.json` in your home directory inside `.homebridge` an
                         "Source6"
                     ]
                 }
-            }
+            ]
       }
    ]
 }

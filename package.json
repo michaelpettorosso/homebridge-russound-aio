@@ -19,7 +19,7 @@
     "homebridge-plugin",
     "homekit"
   ],
-    "files": [
+  "files": [
     "src",
     "graphics",
     "doc",
@@ -42,6 +42,8 @@
   },
   "dependencies": {
     "russound-aio": "^1.0.2"
+  },
+  "devDependencies": {
+    "homebridge": "^1.8.5"
   }
-  
 }

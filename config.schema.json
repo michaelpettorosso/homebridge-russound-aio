@@ -1,0 +1,230 @@
+{
+  "pluginAlias": "Russound-AIO",
+  "pluginType": "platform",
+  "singular": true,
+  "headerDisplay": "This plugin works with Russound RIO Receivers. Controller Zones are exposed to HomeKit as separate accessories and each needs to be manually paired.",
+  "footerDisplay": "For documentation please see [GitHub repository](https://github.com/michaelpettorosso/homebridge-russound-aio).",
+  "schema": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "title": "Name",
+        "type": "string",
+        "placeholder": "Russound AIO",
+        "required": false
+      },
+      "host": {
+        "title": "IP/Hostname",
+        "type": "string",
+        "placeholder": "192.168.1.250",
+        "format": "hostname",
+        "required": true
+      },
+      "port": {
+        "title": "Port",
+        "type": "integer",
+        "placeholder": 9621,
+        "required": false
+      },
+      "volumeControl": {
+        "title": "Volume Control",
+        "type": "string",
+        "default": "1",
+        "oneOf": [
+            {
+                "title": "None",
+                "enum": [
+                    "0"
+                ]
+            },
+            {
+                "title": "As Light",
+                "enum": [
+                    "1"
+                ]
+            },
+            {
+                "title": "As Fan",
+                "enum": [
+                    "2"
+                ]
+            }
+        ],
+        "required": true
+      },
+      "volumeMax": {
+        "title": "Max Volume",
+        "type": "integer",
+        "placeholder": 50,
+        "required": false
+      },
+      "addRemote": {
+        "title": "Add Apple Remote for each zone",
+        "type": "boolean",
+        "placeholder": "false",
+        "required": false
+      },
+      "inputsDisplayOrder": {
+        "title": "Order to display sources",
+        "type": "string",
+        "default": "1",
+        "oneOf": [
+            {
+                "title": "Russound",
+                "enum": [
+                    "0"
+                ]
+            },
+            {
+                "title": "Ascending",
+                "enum": [
+                    "1"
+                ]
+            },
+            {
+                "title": "Descending",
+                "enum": [
+                    "2"
+                ]
+            }
+        ],
+        "required": true
+      },
+      "zones": {
+                "title": "Zones",
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                          "title": "Zone Id",
+                          "description": "Zone Id that corresponds to controller",
+                          "type": "string",
+                          "required": true
+                      },
+                      "enabled": {
+                          "title": "Enabled",
+                          "description": "Enable/Disable Zone (won't appear as an accessory if disabled)",
+                          "type": "boolean",
+                          "required": true
+                      },
+                      "sources": {
+                          "title": "Sources",
+                          "description": "Sources to associate with Zone (as they appear in Russound App)",
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                      }
+                    }
+                }
+      },
+      "enableDebugMode": {
+        "title": "Enable Debug Mode",
+        "type": "boolean",
+        "placeholder": "false",
+        "required": false
+      },
+      "disableLogInfo": {
+        "title": "Disable Log Info",
+        "type": "boolean",
+        "placeholder": "false",
+        "required": false
+      },
+      "disableLogDeviceInfo": {
+        "title": "Disable Log Device Info",
+        "type": "boolean",
+        "placeholder": "false",
+        "required": false
+      }
+    }
+  },
+  "layout": [
+    {
+      "title": "Connection Options",
+      "help": "Connection options for the plugin.",
+      "type": "fieldset",
+      "expandable": false,
+      "items": [
+      	 "name",
+         "host",
+         "port"
+      ]
+    },
+    {
+      "title": "Device Options",
+      "help": "Device options for each zone.",
+      "type": "fieldset",
+      "expandable": true,
+      "items": [
+      	 "volumeControl",
+         "inputsDisplayOrder",
+         "addRemote"
+      ]
+    },
+    {
+      "title": "Zone Settings",
+      "help": "Zone options for the plugin.",
+      "type": "fieldset",
+      "expandable": true,
+      "notitle": false,
+            "items": [
+                {
+                    "key": "zones",
+                    "add": "Add Another Zone Override",
+                    "title": "{{ 'New Zone Override' }}",
+                    "type": "tabarray",
+                    "notitle": true,
+                    "items": [
+                        {
+                            "type": "div",
+                            "displayFlex": false,
+                            "flex-direction": "row",
+                            "notitle": true,
+                            "title": "Zone {{ value.id }}",
+                            "items": [
+                                {
+                                    "key": "zones[].id"
+                                },
+                                {
+                                    "key": "zones[].enabled"
+                                },
+                                {
+                                    "key": "zones[].sources",
+                                    "add": "Add Source",
+                                    "title": "{{ 'New Source' }}",
+                                    "type": "tabarray",
+                                    "items": [
+                                          {
+                                              "type": "div",
+                                              "displayFlex": false,
+                                              "flex-direction": "row",
+                                              "notitle": true,
+                                              "title": "{{ value }}",
+                                              "items": [
+                                                  {
+                                                      "key": "zones[].sources[]",
+                                                      "placeholder": "Source"
+                                                  }
+                                              ]
+                        
+                                          }
+                                    ]
+                                }]    
+                        }]
+                }]                  
+    },		
+
+    {
+      "title": "Logging Options",
+      "help": "Logging options for the plugin.",
+      "type": "fieldset",
+      "expandable": true,
+      "items": [
+      	 "enableDebugMode",
+         "disableLogInfo",
+         "disableLogDeviceInfo"
+      ]
+    }
+  ]
+}
