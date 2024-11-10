@@ -195,8 +195,8 @@ Platform-level configuration parameters:
 | Fields                  | Description                                                        | Default                                                                   | Required |
 |-------------------------|--------------------------------------------------------------------|---------------------------------------------------------------------------|----------|
 | enableDebugMode         | Enable debug logging in Homebridge                                 | false                                                                     | No       |
-| disableLogInfo          | Disable state log info in Homebridge                               | false                                                                     | No       |
-| disableLogDeviceInfo    | Disable device log info in Homebridge                              | false                                                                     | No       |
+| disableLogInfo          | Disable state log info in Homebridge                               | true                                                                      | No       |
+| disableLogDeviceInfo    | Disable device log info in Homebridge                              | true                                                                      | No       |
 
 
 `zones` Zones settings:

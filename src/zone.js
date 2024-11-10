@@ -48,8 +48,8 @@ class Zone extends EventEmitter {
 
         //logging flags
         this.enableDebugMode = config?.enableDebugMode || false;
-        this.disableLogInfo = config?.disableLogInfo || false;
-        this.disableLogDeviceInfo = config?.disableLogDeviceInfo || false;
+        this.disableLogInfo = config?.disableLogInfo || true;
+        this.disableLogDeviceInfo = config?.disableLogDeviceInfo || true;
 
         //sensor settings
         this.sensorPower = config?.sensorPower || false;
