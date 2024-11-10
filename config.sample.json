@@ -1,0 +1,69 @@
+{
+    "name": "Russound AIO",
+    "host": "192.168.1.250",
+    "port": 9621,
+    "enableDebugMode": true,
+    "platform": "Russound-AIO",
+    "zoneNameSuffix": "Speaker",
+    "inputsDisplayOrder": 1,
+    "zones": [
+        {
+            "id" :"1",
+            "enabled": false,
+            "sources": [
+                "Integra",
+                "Sonos",
+                "Airport Express"
+            ]
+        },
+        {   
+            "id": "2",
+            "sources": [
+                "Integra",
+                "Sonos",
+                "Airport Express"
+            ]
+        },
+        {   
+            "id": "3",
+            "enabled": false,
+            "sources": [
+                "Integra",
+                "Sonos",
+                "Airport Express"
+            ]
+        },
+        {  
+            "id": "4",
+            "enabled": false,
+            "sources": [
+                "Integra",
+                "Sonos",
+                "Airport Express"
+            ]
+        },
+        {  
+            "id": "5",
+            "enabled": false,
+            "sources": [
+                "Integra",
+                "Sonos",
+                "Airport Express"
+            ]
+        },
+        {  
+            "id": "6",
+            "enabled": false,
+            "sources": [
+                "Integra",
+                "Retreat TV",
+                "Sonos",
+                "Airport Express"
+            ]
+        }
+    ],
+    "_bridge": {
+        "username": "0E:22:00:E9:BB:AE",
+        "port": 52658
+    }
+}
