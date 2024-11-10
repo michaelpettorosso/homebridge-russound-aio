@@ -2,7 +2,7 @@
 
 `homebridge-russound-aio` is a plugin for Homebridge intended to give you an integrated experience with your [Russound](https://russound.com) devices.
 
-Now creates zones as external devices, and creates Remotes for each zone to use 
+Creates zones as external devices, and creates Remotes for each zone to use 
 
 It provides the HomeKit Zone Accesories with services which include a 
 
@@ -11,19 +11,19 @@ It provides the HomeKit Zone Accesories with services which include a
   volume
   mute 
   volume dimmer (as light slider).
-  remote functions
-      Next
-      Previous
-      MenuUp
-      MenuDown
-      MenuLeft
-      MenuRight
-      Enter
-      Exit
-      Play
-      Pause
-      Stop
-      Info
+  **remote functions**
+-       Next
+-       Previous
+-       MenuUp
+-       MenuDown
+-       MenuLeft
+-       MenuRight
+-       Enter
+-       Exit
+-       Play
+-       Pause
+-       Stop
+-       Info
 
 ![Screenshot](zones.jpg) ![Screenshot](accessories.jpg) ![Screenshot](remote.jpg)
 
@@ -65,8 +65,8 @@ Add the platform in `config.json` in your home directory inside `.homebridge` an
          "platform": "Russound-AIO",
          "zones": [
                 { 
-                 "zoneId": "1",
-	             "enabled": true,
+                 "id": "1",
+                 "enabled": true,
                  "sources": [
                         "Source1",
                         "Source2",
@@ -77,8 +77,8 @@ Add the platform in `config.json` in your home directory inside `.homebridge` an
                     ]
                 },
                 { 
-                 "zoneId": "2",
-	             "enabled": true,
+                 "id": "2",
+                 "enabled": true,
                  "sources": [
                         "Source1",
                         "Source2",
@@ -89,8 +89,8 @@ Add the platform in `config.json` in your home directory inside `.homebridge` an
                     ]
                 },
                 { 
-                 "zoneId": "3",
-	             "enabled": true,
+                 "id": "3",
+                 "enabled": true,
                  "sources": [
                         "Source1",
                         "Source2",
@@ -101,8 +101,8 @@ Add the platform in `config.json` in your home directory inside `.homebridge` an
                     ]
                 },
                 { 
-                 "zoneId": "4",
-	             "enabled": true,
+                 "id": "4",
+                 "enabled": true,
                  "sources": [
                         "Source1",
                         "Source2",
@@ -113,8 +113,8 @@ Add the platform in `config.json` in your home directory inside `.homebridge` an
                     ]
                 },
                 { 
-                 "zoneId": "5",
-	             "enabled": true,
+                 "id": "5",
+                 "enabled": true,
                  "sources": [
                         "Source1",
                         "Source2",
@@ -125,8 +125,8 @@ Add the platform in `config.json` in your home directory inside `.homebridge` an
                     ]
                 },
                 { 
-                 "zoneId": "6",
-	             "enabled": true,
+                 "id": "6",
+                 "enabled": true,
                  "sources": [
                         "Source1",
                         "Source2",
@@ -144,7 +144,7 @@ Add the platform in `config.json` in your home directory inside `.homebridge` an
 
 ### Config Explanation:
 
-The names Zone1, Zone2, Zone3, Zone4, Zone5 and Zone6 should match the Zone names given in the Russound Controller configuration (the names in the Russound App)
+The id for Zone1, Zone2, Zone3, Zone4, Zone5 and Zone6 should match the Zone id given in the Russound Controller configuration (the order in the Russound App)
 
 The names Source1, Source2, Source3, Source4, Source5 and Source6 should match the Source names given in the Russound Controller configuration (the names in the Russound App)
   
@@ -191,6 +191,7 @@ Platform-level configuration parameters:
 
 
 `logging` parameters:
+
 | Fields                  | Description                                                        | Default                                                                   | Required |
 |-------------------------|--------------------------------------------------------------------|---------------------------------------------------------------------------|----------|
 | enableDebugMode         | Enable debug logging in Homebridge                                 | false                                                                     | No       |
@@ -199,6 +200,7 @@ Platform-level configuration parameters:
 
 
 `zones` Zones settings:
+
 | Fields                  | Description                                                        | Default                                                                   | Required |
 |-------------------------|--------------------------------------------------------------------|---------------------------------------------------------------------------|----------|
 | zoneId                  | Id of this zone configured on the Russound Controller.             |                                                                           | Yes      |
@@ -207,6 +209,7 @@ Platform-level configuration parameters:
 | sources                 | List of sources to add to Zone                                     |                                                                           | No       |
 
 `sources` sources settings:
+
 | Fields                  | Description                                                        | Default                                                                   | Required |
 |-------------------------|--------------------------------------------------------------------|---------------------------------------------------------------------------|----------|
 | _                       | Name to of this source configured on the Russound Controller        |                                                                           | No       |
