@@ -175,7 +175,6 @@ Platform-level configuration parameters:
 | platform                | Must always be `Russound-AIO`                                      |                                                                           | Yes      |
 | host                    | Host IP address of your Russound Controller                        |                                                                           | Yes      |
 | port                    | API Port of your Russound Controller                               | 9621                                                                      | No       |
-
 | name                    | Name to use for this Russound Controller.                          | [controller type] eg. MCA-66                                              | No       |
 | zoneNameSuffix          | Suffix to add to Zone Name eg. Speaker                             |                                                                           | No       |
 | addRemote               | Add Apple remote to all Zones                                      | false                                                                     | No       |
