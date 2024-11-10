@@ -187,7 +187,6 @@ Platform-level configuration parameters:
 | sensorVolume            | Add Sensor Volume (for change)                                     | false                                                                     | No       |
 | sensorMute              | Add Sensor Mute (for change)                                       | false                                                                     | No       |
 | sensorInput             | Add Sensor Input (for change)                                      | false                                                                     | No       |
-
 | zones                   | List of Zones to configure                                         | {}                                                                        | No       |
 
 
