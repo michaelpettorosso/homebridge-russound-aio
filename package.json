@@ -1,7 +1,7 @@
 {
   "displayName": "Russound AIO",
   "name": "homebridge-russound-aio",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Russound AIO plugin for homebridge: https://github.com/nfarina/homebridge",
   "main": "index.js",
   "scripts": {
@@ -41,7 +41,7 @@
     "url": "https://github.com/michaelpettorosso/homebridge-russound-aio/issues"
   },
   "dependencies": {
-    "russound-aio": "^1.0.2"
+    "russound-aio": "^1.0.4"
   },
   "devDependencies": {
     "homebridge": "^1.8.5"

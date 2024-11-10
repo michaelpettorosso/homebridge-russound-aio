@@ -81,22 +81,22 @@ class Zone extends EventEmitter {
         this.inputsConfigured = [];
         this.inputIdentifier = 1;
 
-        //buttons settings
-        this.buttons = config?.buttons || [];
-        this.buttonsConfigured = [];
-        for (const button of this.buttons) {
-            const buttonName = button.name ?? false;
-            const buttonReference = button.reference ?? false;
-            const buttonDisplayType = button.displayType ?? 0;
-            if (buttonName && buttonReference && buttonDisplayType > 0) {
-                button.serviceType = ['', Service.Outlet, Service.Switch][buttonDisplayType];
-                button.state = false;
-                this.buttonsConfigured.push(button);
-            } else {
-                const log = buttonDisplayType === 0 ? false : this.log(`Button Name: ${buttonName ? buttonName : 'Missing'}, Reference: ${buttonReference ? buttonReference : 'Missing'}.`);
-            };
-        }
-        this.buttonsConfiguredCount = this.buttonsConfigured.length || 0;
+        // //buttons settings
+        // this.buttons = config?.buttons || [];
+        // this.buttonsConfigured = [];
+        // for (const button of this.buttons) {
+        //     const buttonName = button.name ?? false;
+        //     const buttonReference = button.reference ?? false;
+        //     const buttonDisplayType = button.displayType ?? 0;
+        //     if (buttonName && buttonReference && buttonDisplayType > 0) {
+        //         button.serviceType = ['', Service.Outlet, Service.Switch][buttonDisplayType];
+        //         button.state = false;
+        //         this.buttonsConfigured.push(button);
+        //     } else {
+        //         const log = buttonDisplayType === 0 ? false : this.log(`Button Name: ${buttonName ? buttonName : 'Missing'}, Reference: ${buttonReference ? buttonReference : 'Missing'}.`);
+        //     };
+        // }
+        // this.buttonsConfiguredCount = this.buttonsConfigured.length || 0;
 
         //state variables
         this.startPrepareAccessory = true;
@@ -113,7 +113,7 @@ class Zone extends EventEmitter {
 
             const { status, volume, mute, currentSource } = zone;
             const power = status === 'ON';
-            const mutedState = power ? mute === 'ON' : false;
+            const mutedState = power ? mute === 'ON' : true;
             const powerState = power ? Characteristic.Active.ACTIVE : Characteristic.Active.INACTIVE;
 
             const input = this.inputsConfigured.find(input => input.identifier == parseInt(currentSource, 10)) ?? false;
@@ -161,7 +161,7 @@ class Zone extends EventEmitter {
             }
 
             if (this.sensorMuteService) {
-                const state = power && mute === 'ON';
+                const state = mutedState;
                 this.sensorMuteService.updateCharacteristic(Characteristic.ContactSensorState, this.contactSensorState(state));
             }
 
@@ -211,23 +211,25 @@ class Zone extends EventEmitter {
     start = async(sources) => {
         try {
             if (this.startPrepareAccessory)
-                {
-                    //read inputs names from file
-                    const savedInputsNames = await Utils.readData(this.inputsNamesFile);
-                    this.savedInputsNames = savedInputsNames.toString().trim() !== '' ? JSON.parse(savedInputsNames) : {};
-                    this.debugLog(`Read saved Inputs Names: ${Utils.objectToJsonString(this.savedInputsNames)}`);
-        
-                    //read inputs visibility from file
-                    const savedInputsTargetVisibility = await Utils.readData(this.inputsTargetVisibilityFile);
-                    this.savedInputsTargetVisibility = savedInputsTargetVisibility.toString().trim() !== '' ? JSON.parse(savedInputsTargetVisibility) : {};
-                    this.debugLog(`Read saved Inputs Target Visibility: ${Utils.objectToJsonString(this.savedInputsTargetVisibility)}`);
-                }
+            {
+                //read inputs names from file
+                const savedInputsNames = await Utils.readData(this.inputsNamesFile);
+                this.savedInputsNames = savedInputsNames.toString().trim() !== '' ? JSON.parse(savedInputsNames) : {};
+                this.debugLog(`Read saved Inputs Names: ${Utils.objectToJsonString(this.savedInputsNames)}`);
+    
+                //read inputs visibility from file
+                const savedInputsTargetVisibility = await Utils.readData(this.inputsTargetVisibilityFile);
+                this.savedInputsTargetVisibility = savedInputsTargetVisibility.toString().trim() !== '' ? JSON.parse(savedInputsTargetVisibility) : {};
+                this.debugLog(`Read saved Inputs Target Visibility: ${Utils.objectToJsonString(this.savedInputsTargetVisibility)}`);
+            }
 
-            if (this.enableDebugMode)
+            if (this.enableDebugMode) 
             {
                 this.devInfoLog(`Logging: enableDebugMode: ${this.enableDebugMode}`);
                 this.devInfoLog(`Logging: disableLogInfo: ${this.disableLogInfo}`);
                 this.devInfoLog(`Logging: disableLogDeviceInfo: ${this.disableLogDeviceInfo}`);
+
+                this.devInfoLog(`Add Remote: ${this.addRemote}`);
 
                 this.devInfoLog(`Sensor: sensorPower: ${this.sensorPower}`);
                 this.devInfoLog(`Sensor: sensorVolume: ${this.sensorVolume}`);
@@ -243,46 +245,50 @@ class Zone extends EventEmitter {
                 this.devInfoLog(`File: inputsNamesFile: ${this.inputsNamesFile}`);
                 this.devInfoLog(`File: inputsTargetVisibilityFile: ${this.inputsTargetVisibilityFile}`);
             }
-        
-            if (!this.disableLogInfo)
-            {
-                this.devInfoLog(`Power: ${this.power}`);
-                this.devInfoLog(`Volume: ${this.volume}`);
-                this.devInfoLog(`Muted: ${this.muted}`);
-                this.devInfoLog(`Media State: ${this.mediaState}`);
-                this.devInfoLog(`Add Remote: ${this.addRemote}`);
-            }
 
-            if (!this.disableLogDeviceInfo) {
+            //save device info
+            const saveDevInfo = await Utils.saveData(this.devInfoFile, 
+            { 
+                name: this.name,
+                manufacturer: this.manufacturer,
+                modelName: this.modelName,
+                control: `Zone ${this.zone.name}`,
+                zoneId: this.zoneId,
+                macAddress: this.macAddress,
+                firmware: this.firmwareRevision,
+                apiVersion: this.apiVersion,
+                serialNumber: this.serialNumber
+            });
+            
+            if (!this.disableLogDeviceInfo) 
+            {
                 this.devInfoLog(`-------- ${this.name} --------`);
                 this.devInfoLog(`Manufacturer: ${this.manufacturer}`);
                 this.devInfoLog(`Model: ${this.modelName}`);
                 this.devInfoLog(`Control: ${this.zone.name}`);
                 this.devInfoLog(`Zone Id: ${this.zoneId}`);
+                this.devInfoLog(`MAC Address: ${this.macAddress}`);
                 this.devInfoLog(`Firmware: ${this.firmwareRevision}`);
                 this.devInfoLog(`Api Version: ${this.apiVersion}`);
                 this.devInfoLog(`Serial Number: ${this.serialNumber}`);
                 this.devInfoLog(`----------------------------------`);
             }
 
-            const saveDevInfo = await Utils.saveData(this.devInfoFile, { 
-                name: this.name,
-                manufacturer: this.manufacturer,
-                modelName: this.modelName,
-                control: `Zone ${this.zone.name}`,
-                zoneId: this.zoneId,
-                firmware: this.firmwareRevision,
-                apiVersion: this.apiVersion,
-                serialNumber: this.serialNumber
-             });
-
-            if (this.startPrepareAccessory)
+            if (!this.disableLogInfo) 
             {
-                this.startPrepareAccessory = false;
+                this.devInfoLog(`Power: ${this.power}`);
+                this.devInfoLog(`Volume: ${this.volume}`);
+                this.devInfoLog(`Muted: ${this.muted}`);
+                this.devInfoLog(`Media State: ${this.mediaState}`);
+            }
+
+            if (this.startPrepareAccessory) 
+            {
                 const accessory = this.prepareAccessory(sources);
                 const sortInputsDisplayOrder = this.televisionService ? await this.displayOrder() : false;
                 this.emit('publishAccessory', accessory);
             }    
+            this.startPrepareAccessory = false;
             return true;
         } catch (error) {
             throw new Error(`Start error: ${error.message || error}.`);
@@ -364,8 +370,8 @@ class Zone extends EventEmitter {
           .setCharacteristic(Characteristic.Model, this.modelName)
           .setCharacteristic(Characteristic.SerialNumber, this.serialNumber)
           .setCharacteristic(Characteristic.FirmwareRevision, this.firmwareRevision);
-        this.informationService.addOptionalCharacteristic(Characteristic.ConfiguredName);
-        this.informationService.setCharacteristic(Characteristic.ConfiguredName, this.name);  
+        // this.informationService.addOptionalCharacteristic(Characteristic.ConfiguredName);
+        // this.informationService.setCharacteristic(Characteristic.ConfiguredName, this.name);  
         this.informationService.addOptionalCharacteristic(Characteristic.HardwareRevision);
         this.informationService.setCharacteristic(Characteristic.HardwareRevision, this.macAddress);  
         this.informationService.addOptionalCharacteristic(Characteristic.SoftwareRevision);
@@ -381,17 +387,18 @@ class Zone extends EventEmitter {
         this.televisionService.setCharacteristic(Characteristic.SleepDiscoveryMode, Characteristic.SleepDiscoveryMode.ALWAYS_DISCOVERABLE);
         this.televisionService.getCharacteristic(Characteristic.Active)
             .onSet(async (state) => {
-                if (this.power == state) {
+                const power = (state === Characteristic.Active.ACTIVE ? true : false);
+                if (this.power == power) {
                     return;
                 }
 
                 try {
-                    if (state)
+                    if (power)
                         await this.zone.zoneOn();
                     else
                         await this.zone.zoneOff();
 
-                    this.infoLog(`set Power: ${state ? 'ON' : 'OFF'}`);
+                    this.infoLog(`set Power: ${power ? 'ON' : 'OFF'}`);
                 } catch (error) {
                     this.warnLog(`set Power error: ${error}`);
                 };
@@ -579,17 +586,13 @@ class Zone extends EventEmitter {
         const maxInputsCount = inputsCount >= possibleInputsCount ? possibleInputsCount : inputsCount;
         for (let i = 0; i < maxInputsCount; i++) {
             //input
-            const input = inputs[i];
-
-            //get input reference
-            const inputIdentifier = input.identifier;
-
+            let input = inputs[i];
+            let inputIdentifier = input.identifier;
             //get input name
-            const savedInputsName = this.savedInputsNames[inputIdentifier] || false;
-            input.name = savedInputsName ? savedInputsName : input.name;
+            input.name = this.savedInputsNames[inputIdentifier] || input.name;
 
             //get visibility
-            input.visibility = this.savedInputsTargetVisibility[inputIdentifier] || Characteristic.CurrentVisibilityState.SHOWN;
+            const visible = this.savedInputsTargetVisibility[inputIdentifier] || Characteristic.CurrentVisibilityState.SHOWN;
 
             //input service
             const inputService = new Service.InputSource(input.name, `Input ${inputIdentifier}`);
@@ -599,7 +602,7 @@ class Zone extends EventEmitter {
                 .setCharacteristic(Characteristic.Identifier, inputIdentifier)
                 .setCharacteristic(Characteristic.IsConfigured, Characteristic.IsConfigured.CONFIGURED)
                 .setCharacteristic(Characteristic.InputSourceType, Characteristic.InputSourceType.OTHER)
-                .setCharacteristic(Characteristic.CurrentVisibilityState, input.visibility)
+                .setCharacteristic(Characteristic.CurrentVisibilityState, visible);
 
             inputService.getCharacteristic(Characteristic.ConfiguredName)
                 .onSet(async (value) => {
@@ -610,13 +613,13 @@ class Zone extends EventEmitter {
                     try {
                         this.savedInputsNames[inputIdentifier] = value;
                         await Utils.saveData(this.inputsNamesFile, this.savedInputsNames);
+
                         const input = this.inputsConfigured.find(input => input.identifier == inputIdentifier);
                         if (input)
                             input.name = value;
                         this.debugLog(`Saved Input Name: ${value}, Input Identifier: ${inputIdentifier}`);
 
                         //sort inputs
-
                         await this.displayOrder();
                     } catch (error) {
                         this.warnLog(`save Input Name error: ${error}`);
@@ -630,7 +633,6 @@ class Zone extends EventEmitter {
                     }
 
                     try {
-                        input.visibility = state;
                         this.savedInputsTargetVisibility[inputIdentifier] = state;
                         await Utils.saveData(this.inputsTargetVisibilityFile, this.savedInputsTargetVisibility);
                         this.debugLog(`Saved Input: ${input.name} Target Visibility: ${state ? 'HIDEN' : 'SHOWN'}`);
@@ -663,6 +665,9 @@ class Zone extends EventEmitter {
                         this.speakerService.setCharacteristic(Characteristic.Volume, volume);
                     });
                 this.volumeService.getCharacteristic(Characteristic.On)
+                    .onGet(() => {
+                        return !this.muted;
+                    })
                     .onSet(async (state) => {
                         this.speakerService.setCharacteristic(Characteristic.Mute, !state);
                     });

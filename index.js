@@ -36,9 +36,8 @@ class RussoundAIOPlatform {
 			return;
 		}
 
-
-		this.enableDebugMode = config?.enableDebugMode || false;
 		//debug config
+		this.enableDebugMode = config?.enableDebugMode || false;
 		this.debugLog(`Controller: ${this.host} ${this.controllerName}, Config: ${Utils.objectToJsonString(config)}`);
 
 		this.api.on('didFinishLaunching', async () => {
@@ -52,21 +51,22 @@ class RussoundAIOPlatform {
 				await russound.registerStateUpdateCallbacks(this.onStateChange);
 				await russound.connect();
 
-				const sourcesData = this.configuredSources(russound);
+				const sourcesData = this.configuredSources(russound.sources);
 				const inputsFile = `${prefDir}/inputs_C${this.controllerId}${this.host.split('.').join('')}`;
 
 				const createFiles = Utils.createFiles(this.log, [inputsFile]);
 
 				if (!createFiles)
 					return;
+
 				await Utils.saveData(inputsFile, sourcesData);
 
 				const controller = russound.controllers[this.controllerId];
 				const { zones, ...commonConfig } = this.config;
 
-				for (const [z_id, zone] of Object.entries(controller.zones)) {
+				for (const [zoneId, zone] of Object.entries(controller.zones)) {
 					try {
-						this.debugLog(`Adding Zone: ${z_id} - ${zone.name}`);
+						this.debugLog(`Adding Zone: ${zoneId} - ${zone.name}`);
 						//check files exists, if not then create it
 						const postFix = `${zone.deviceStr.replace(/[\[\].']+/g,'')}${this.host.split('.').join('')}`;
 						const devInfoFile = `${prefDir}/devInfo_${postFix}`;
@@ -81,23 +81,24 @@ class RussoundAIOPlatform {
 		
 						if (!createFiles)
 							return;
-						const zoneConfig = zones?.find(zone => zone.id === z_id) ?? { id: z_id };
+
+						const zoneConfig = zones?.find(zone => zone.id === zoneId) ?? { id: zoneId };
 						const config = { 
-										...commonConfig,
-										name: zone.name,
-										...zoneConfig,
-										devInfoFile, 
-										inputsNamesFile, 
-										inputsTargetVisibilityFile 
-									};
+							...commonConfig,
+							name: zone.name,
+							...zoneConfig,
+							devInfoFile, 
+							inputsNamesFile, 
+							inputsTargetVisibilityFile 
+						};
 
 						this.debugLog(`Zone: ${zone.name}, debug: config: ${Utils.objectToJsonString(config)}`);					 
 						const zoneAccessory = new Zone(api, controller, config);
 
 						this.zones.push (
 							{
-								id: z_id,
-								zoneAccessory: zoneAccessory
+								id: zoneId,
+								accessory: zoneAccessory
 							}
 						);
 						zoneAccessory.on('publishAccessory', (accessory) => {
@@ -134,12 +135,12 @@ class RussoundAIOPlatform {
 		});
 	}
 
-    configuredSources = (client) => {
+    configuredSources = (sources) => {
 		const sourcesData = [];
-		for (const [s_id, source] of Object.entries(client.sources)) {
+		for (const [sourceId, source] of Object.entries(sources)) {
 			if (source.type != '')
 			{
-				sourcesData.push(this.sourceData(source, s_id))
+				sourcesData.push(this.sourceData(source, sourceId))
 			}
 		}	
 		return sourcesData;
@@ -163,25 +164,23 @@ class RussoundAIOPlatform {
 				currentSource
 			}
 		}
-	
 
 		try {
-		  this.debugLog(`Controller: onStateChange: callbackType: ${callbackType}`);
 		  if (callbackType === "state")
 		  {
-			const sourcesData = this.configuredSources(client);
+			const sourcesData = this.configuredSources(client.sources);
 
 			const controller = client.controllers[1];
+			//notify zones of state change
 			for (const zone of this.zones) {
-				zone.zoneAccessory.onStateChange(zoneData(controller.zones[zone.id]), sourcesData)
+				let data = zoneData(controller.zones[zone.id]);
+				zone.accessory.onStateChange(data, sourcesData);
 			}
   		  }
 
 		} catch (error) {
 			this.log.error(`onStateChange: error: ${error}`);
 		}
-
-	
 	} 
 
 
