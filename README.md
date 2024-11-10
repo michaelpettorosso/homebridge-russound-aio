@@ -210,7 +210,7 @@ Platform-level configuration parameters:
 `sources` sources settings:
 | Fields                  | Description                                                        | Default                                                                   | Required |
 |-------------------------|--------------------------------------------------------------------|---------------------------------------------------------------------------|----------|
-| name                    | Name to of this source configured on the Russound Controller       |                                                                           | Yes      |
+| _                       | Name to of this source configured on the Russound Controller        |                                                                           | No       |
 
 
 ## Credits
